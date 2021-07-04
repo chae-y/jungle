@@ -42,48 +42,99 @@
         <script>
             $(document).ready(function(){
                 showStar();
-            })
+            });
 
             function showStar(){
+                //1. 모두 삭제
+                $('#star-box').empty()
+                //2. list 요청
                 $.ajax({
                     type:'GET',
                     url: '/api/list',
                     data: {},
                     success: function(response){
-                        if(response['result']=='success'){
-                            let msg = reponse['msg'];
-                            alert(msg);
+                        console.log("hi");
+                        let stars = response['stars_list'];
+                        //3. for로 하나씩 조회
+                        console.log(stars.length)
+                        for(let i=0; i<stars.length; i++){
+                            let star = stars[i];
+                            
+                            let name=star['name'];
+                            let url = star['url'];
+                            let imgUrl = star['img_url'];
+                            let recentWork = star['recent'];
+                            let like = star['like'];
+                            console.log(name);
+                            //4. 카드 만들기
+                            let tempHtml = `
+                            <div class = "card">
+                                <div class = "card-content">
+                                    <div class="media">
+                                        <div class="media-left">
+                                            <figure class= "image is-48x48">
+                                                <img 
+                                                    src="${imgUrl}"
+                                                    alt="Placeholder image"
+                                                />
+                                            </figure>
+                                        </div>
+                                        <div class = "media-content">
+                                            <a href="#" target="_blank" class="star-name title is-4">${name} (좋아요:${like})</a>
+                                            <p class= "subtitle is-6">${recentWork}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <footer class="card-footer">
+                                    <a herf="#" onclick="likeStar('${name}')" class= "card-footer-item has-text-info">
+                                        위로!
+                                        <span class = "icon">
+                                            <i class="fas fa-thumbs-up"></i>
+                                        </span>
+                                    </a>
+                                    <a herf="#" onclick="deleteStar('${name}')" class= "card-footer-item has-text-danger">
+                                        삭제
+                                        <span class = "icon">
+                                            <i class="fas fa-ban"></i>
+                                        </span>
+                                    </a>
+                                </footer>
+                            </div>
+                            `;
+
+                            //5. append
+                            $('#star-box').append(tempHtml);
                         }
                     }
-                })
+                });
             }
 
             function likeStar(name){
                 $.ajax({
                     type:'POST',
                     url: 'api/like',
-                    data: {},
+                    data: {'name_give':name},
                     success: function(response){
                         if(response['result']=='success'){
-                            let msg = response['msg'];
-                            alert(msg);
+                            alert("좋아요 완료!");
+                            window.location.reload();
                         }
                     }
-                })
+                });
             }
 
             function deleteStar(name){
                 $.ajax({
                     type: 'POST',
                     url: '/api/delete',
-                    data: {},
+                    data: {'name_give':name},
                     success: function(response){
                         if(response['result']=='success'){
-                            let msg = response['msg'];
-                            alert(msg);
+                            alert("삭제 완료!");
+                            window.location.reload();
                         }
                     }
-                })
+                });
             }
         </script>
     </head>
